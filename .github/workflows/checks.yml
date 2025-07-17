@@ -54,7 +54,7 @@ jobs:
 
       - name: Wait for PostgreSQL  # db 연결을 테스트
         run: |
-          until pg_isready -p ${{ secrets.PG_PORT }} -U ${{ secrets.PG_USER }}; do 
+          until pg_isready -h localhost -p ${{ secrets.PG_PORT }} -U ${{ secrets.PG_USER }}; do 
           sleep 1
           done
 
