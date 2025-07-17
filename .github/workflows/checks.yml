@@ -10,30 +10,24 @@ on:
 
 jobs:
   ci:
-	# 가장 최신버젼의 ubuntu를 OS 환경으로 설정합니다.
-    runs-on: ubuntu-latest
-    # services 키워드를 사용하여 PostgreSQL 서비스를 설정
-    services:
+    runs-on: ubuntu-latest # 가장 최신버젼의 ubuntu를 OS 환경으로 설정합니다.
+    services: # services 키워드를 사용하여 PostgreSQL 서비스를 설정
       db:
         image: postgres:14
         ports:
           - 5432:5432
-        # Github Secrets에서 가져와서 env로 등록, Postgres 데이터 베이스 연결 설정
-        env:
+        env: # Github Secrets에서 가져와서 env로 등록, Postgres 데이터 베이스 연결 설정
           POSTGRES_USER: ${{ secrets.PG_USER }}
           POSTGRES_PASSWORD: ${{ secrets.PG_PASSWORD }}
           POSTGRES_DB: ${{ secrets.PG_NAME }}
-        # 옵션으로 postgres의 연결 상태를 확인. 10초 단위로 5번 재시도. 5초간 기다림.
-        options: >-
+        options: >- # 옵션으로 postgres의 연결 상태를 확인. 10초 단위로 5번 재시도. 5초간 기다림.
           --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
 
-	# CI 환경에서 코드를 체크아웃합니다.
-    steps:
+    steps: # CI 환경에서 코드를 체크아웃합니다.
     - name: Checkout code
       uses: actions/checkout@v3
 
-	# CI 환경에서 사용할 파이썬 버젼을 지정합니다.
-    - name: Set
+    - name: Set # CI 환경에서 사용할 파이썬 버젼을 지정합니다.
