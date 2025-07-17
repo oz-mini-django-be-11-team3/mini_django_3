@@ -52,14 +52,10 @@ jobs:
         run: |
           uv run black . --check
 
-      - name: Run PostgreSQL
-        run: | 
-          sudo service postgresql start
-
       - name: Wait for PostgreSQL  # db 연결을 테스트
         run: |
-          until pg_isready -p ${{ secrets.PG_PORT }} -U ${{ secrets.PG_USER }}; 
-          do sleep 1
+          until pg_isready -h localhost -p ${{ secrets.PG_PORT }} -U ${{ secrets.PG_USER }}; do 
+          sleep 1
           done
 
 #      - name: Run Django Migration   # 정상적인 db연결을 확인했으니 마이그레이션 수행
