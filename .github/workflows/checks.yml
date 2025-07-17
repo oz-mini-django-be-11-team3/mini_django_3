@@ -1,0 +1,39 @@
+# .github/workflows/checks.yml
+
+name: Code Quality Checks
+
+# 트리거 이벤트 부분
+# 코드가 푸시되거나 풀 리퀘스트가 생성될 때 CI가 실행됩니다.
+on:
+  push: # 변경사항 있을 때마다
+    branches: [ '**' ] # all branches 에 적용
+
+jobs:
+  ci:
+	# 가장 최신버젼의 ubuntu를 OS 환경으로 설정합니다.
+    runs-on: ubuntu-latest
+    # services 키워드를 사용하여 PostgreSQL 서비스를 설정
+    services:
+      db:
+        image: postgres:14
+        ports:
+          - 5432:5432
+        # Github Secrets에서 가져와서 env로 등록, Postgres 데이터 베이스 연결 설정
+        env:
+          POSTGRES_USER: ${{ secrets.PG_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.PG_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.PG_NAME }}
+        # 옵션으로 postgres의 연결 상태를 확인. 10초 단위로 5번 재시도. 5초간 기다림.
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+	# CI 환경에서 코드를 체크아웃합니다.
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+	# CI 환경에서 사용할 파이썬 버젼을 지정합니다.
+    - name: Set
