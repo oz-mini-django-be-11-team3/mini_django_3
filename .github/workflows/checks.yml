@@ -25,9 +25,44 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-
-    steps:
-      - name: Checkout code # CI 환경에서 코드를 체크아웃합니다.
+    steps: # CI 환경에서 코드를 체크아웃합니다.
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set # CI 환경에서 사용할 파이썬 버젼을 지정합니다.
+      - name: Set up Python # CI 환경에서 사용할 파이썬 버젼을 지정합니다.
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'
+
+      - name: Install uv # uv를 설치합니다.
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+      - name: Install Packages & Libraries # uv를 사용하여 의존성 패키지들을 설치합니다.
+        run: |
+          uv sync --dev-packages
+
+      - name: Run isort (Import sorting) # isort를 사용하여 import 구문의 정렬 순서를 체크합니다.
+        run: |
+          uv run isort . --check --diff
+
+      - name: Run black (Code formatting) # black을 사용하여 PEP8 코드스타일을 준수했는지 체크합니다.
+        run: |
+          uv run black . --check
+
+      - name: Wait for PostgreSQL  # db 연결을 테스트
+        run: |
+          until pg_isready -h localhost -p ${{ secrets.DB_PORT }} -U ${{ secrets.DB_USER }}; 
+          do sleep 1
+          done
+
+      - name: Run Django Migration   # 정상적인 db연결을 확인했으니 마이그레이션 수행
+        run: |
+          uv run python manage.py makemigrations
+          uv run python manage.py migrate
+
+    #        - name: Test python project # django test를 사용하여 모든 앱의 테스트코드를 실행합니다.
+    #          run: |
+    #            uv run python manage.py test
