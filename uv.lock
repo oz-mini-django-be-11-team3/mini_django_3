@@ -30,16 +30,20 @@ name = "django-financial"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "asgiref" },
     { name = "django" },
     { name = "django-restframework" },
     { name = "psycopg2" },
+    { name = "sqlparse" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "django", specifier = ">=5.2.4" },
-    { name = "django-restframework", specifier = ">=0.0.1" },
-    { name = "psycopg2", specifier = ">=2.9.10" },
+    { name = "asgiref", specifier = "==3.9.1" },
+    { name = "django", specifier = "==5.2.4" },
+    { name = "django-restframework", specifier = "==0.0.1" },
+    { name = "psycopg2", specifier = "==2.9.10" },
+    { name = "sqlparse", specifier = "==0.5.3" },
 ]
 
 [[package]]
