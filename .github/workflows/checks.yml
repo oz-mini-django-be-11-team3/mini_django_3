@@ -26,8 +26,8 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
-    steps: # CI 환경에서 코드를 체크아웃합니다.
-      - name: Checkout code
+    steps:
+      - name: Checkout code # CI 환경에서 코드를 체크아웃합니다.
         uses: actions/checkout@v3
 
       - name: Set # CI 환경에서 사용할 파이썬 버젼을 지정합니다.
