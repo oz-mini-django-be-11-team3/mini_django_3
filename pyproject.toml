@@ -8,7 +8,11 @@ dependencies = [
     "asgiref==3.9.1",
     "django==5.2.4",
     "django-restframework==0.0.1",
+    "djangorestframework>=3.16.0",
+    "djangorestframework-simplejwt>=5.5.0",
+    "drf-spectacular>=0.28.0",
     "psycopg2==2.9.10",
+    "python-dotenv>=1.1.1",
     "sqlparse==0.5.3",
 ]
 

@@ -1,14 +1,15 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import CustomUserModel
+from .models import User
 
 
-@admin.register(CustomUserModel)
-class CustomAdmin(UserAdmin):
+@admin.register(User)
+class UserAdmin(UserAdmin):
     list_display = [
-        "id",
         "email",
+        "id",
+        "last_login",
         "name",
         "nickname",
         "phone_number",
@@ -19,6 +20,7 @@ class CustomAdmin(UserAdmin):
     ]
     search_fields = ("email", "nickname", "name", "phone_number")
     ordering = ("name",)
+
     # 사용자 수정 화면 디스플레이
     fieldsets = (
         (None, {"fields": ("email", "password")}),
@@ -37,6 +39,7 @@ class CustomAdmin(UserAdmin):
         ),
         ("접속 일시", {"fields": ("last_login",)}),
     )
+
     # 사용자 생성 디스플레이
     add_fieldsets = (
         (
@@ -44,7 +47,6 @@ class CustomAdmin(UserAdmin):
             {
                 "classes": ("wide",),
                 "fields": (
-                    "username",
                     "email",
                     "name",
                     "nickname",
