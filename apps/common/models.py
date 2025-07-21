@@ -2,11 +2,11 @@ from django.db import models
 
 
 class CommonModel(models.Model):
-    # 생성된 시간 (고정)
-    created_at = models.DateTimeField(auto_now_add=True)
+    # 고정
+    created_at = models.DateTimeField("생성 일시", auto_now_add=True)
 
-    # 데이터가 업데이트된 시간 (업데이트 할 때 마다 계속 시간이 변경)
-    updated_at = models.DateTimeField(auto_now=True)
+    # 데이터를 업데이트할 때 마다 변경
+    updated_at = models.DateTimeField("최근 업데이트 일시", auto_now=True)
 
     """
     # DB에 테이블을 추가하지 마시오.
