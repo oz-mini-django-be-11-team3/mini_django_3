@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser, BaseUserManager
-from apps.common.models import CommonModel
 from django.db import models
+
+from apps.common.models import CommonModel
 
 
 class CustomUserManager(BaseUserManager):
@@ -30,6 +31,9 @@ class User(AbstractUser, CommonModel):
         max_length=255,
         unique=True,
     )
+    username = models.CharField(
+        "이름",
+    )
     # 닉네임 필드
     nickname = models.CharField(max_length=50, unique=True, verbose_name="닉네임")
     # 이름 필드
@@ -48,7 +52,7 @@ class User(AbstractUser, CommonModel):
     # createsuperuser 명령 시 필수로 입력받을 필드 목록
     REQUIRED_FIELDS = ["nickname", "name"]
 
-    # objects = CustomUserManager()
+    objects = CustomUserManager()
 
     def __str__(self):
         # 사용자 객체를 문자열로 표현할 때 이메일 주소를 반환

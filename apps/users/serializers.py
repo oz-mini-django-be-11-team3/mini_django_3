@@ -1,8 +1,8 @@
 from django.contrib.auth import authenticate, get_user_model
 from rest_framework import serializers
 
-
 User = get_user_model()
+
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
@@ -57,6 +57,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         )
         return user
 
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -84,6 +85,7 @@ class UserSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
+
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()

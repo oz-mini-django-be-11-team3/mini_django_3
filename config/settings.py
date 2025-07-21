@@ -9,10 +9,12 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
+
+from datetime import timedelta
 from os import getenv
 from pathlib import Path
-from dotenv import load_dotenv # .env에 있는 환경변수를 불러온다.
-from datetime import timedelta
+
+from dotenv import load_dotenv  # .env에 있는 환경변수를 불러온다.
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -29,6 +31,8 @@ SECRET_KEY = "django-insecure-lqrdz0ob_6ecy0nsq8x#ec95%)0o@58-0(2m@#ep$p^!(5s#r-
 DEBUG = True
 
 ALLOWED_HOSTS = []
+
+REFRESH_TOKEN_COOKIE_SECURE = True
 
 
 # Application definition

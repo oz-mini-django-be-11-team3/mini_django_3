@@ -5,13 +5,15 @@ from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView, Response
-from .permissions import IsOwner
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .serializers import LoginSerializer, UserRegistrationSerializer, UserSerializer
+from .permissions import IsOwner
+from .serializers import (LoginSerializer, UserRegistrationSerializer,
+                          UserSerializer)
 
 User = get_user_model()
+
 
 class UserRegistrationView(APIView):
     """
@@ -54,6 +56,7 @@ class UserRegistrationView(APIView):
                 status=status.HTTP_201_CREATED,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class JWTLoginView(APIView):
     """
@@ -99,6 +102,7 @@ class JWTLoginView(APIView):
             max_age=5 * 60 * 60,  # 5시간
         )
         return response
+
 
 class JWTLogoutView(APIView):
     """
@@ -153,6 +157,7 @@ class JWTLogoutView(APIView):
                 {"error": f"로그아웃 중 오류가 발생했습니다: {str(e)}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
+
 
 class UserProfileAPIView(APIView):
     """
