@@ -1,6 +1,5 @@
-from django.db import models
-
 from apps.common.models import CommonModel
+from django.db import models
 
 # from apps.accounts.models import Account
 

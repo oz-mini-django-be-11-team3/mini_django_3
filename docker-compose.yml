@@ -1,0 +1,40 @@
+#version: "3.11" # Docker Compose API
+
+services: # Container
+  app: # Django
+    build:
+      context: . # Dockerfile
+      args:
+        - DEV=true
+    networks:
+      - shared-net
+    ports:
+      - "8000:8000"
+    env_file: .env
+    depends_on:
+      db:
+        condition: service_started
+        required: true
+    volumes:
+      - ./app:/app
+    command: ["/scripts/run.sh"]
+
+  db:
+    image: postgres:17
+    networks:
+      - shared-net
+    ports:
+      - "5431:5432"
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data:
+
+networks:
+  shared-net:
+    driver: bridge
