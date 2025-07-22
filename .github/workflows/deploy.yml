@@ -33,6 +33,17 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
         aws-region: ap-northeast-2
 
+    - name: Generate app.env
+      run: |
+        mkdir -p secrets
+        cat <<EOF > app.env
+        MYSQL_HOST=db
+        MYSQL_PORT=5432
+        MYSQL_USER=postgres
+        MYSQL_PASSWORD=wkdrhwkdrh
+        MYSQL_DB=postgres
+        EOF
+        
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
