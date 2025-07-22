@@ -3,6 +3,7 @@ from django.db import models
 
 from apps.common.models import CommonModel
 
+from ..users.models import User
 from .constants import ACCOUNT_TYPE_CHOICES, BANK_CODES
 
 
