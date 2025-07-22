@@ -36,11 +36,12 @@ jobs:
     - name: Generate .env
       run: |
         cat <<EOF > .env
-        MYSQL_HOST=db
-        MYSQL_PORT=5432
-        MYSQL_USER=postgres
-        MYSQL_PASSWORD=wkdrhwkdrh
-        MYSQL_DB=postgres
+        DB_HOST=db
+        DB_PORT=5432
+        DB_USER=postgres
+        DB_PASSWORD=wkdrhwkdrh
+        DB_NAME=postgres
+        DJANGO_ALLOWED_HOSTS=127.0.0.1, 0.0.0.0
         EOF
 
     - name: Login to Amazon ECR
@@ -55,4 +56,4 @@ jobs:
       run: |
         docker build -t $ECR_REGISTRY:$IMAGE_TAG .
         docker push $ECR_REGISTRY:$IMAGE_TAG
-        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+        echo "::set output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
