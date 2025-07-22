@@ -18,8 +18,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 
+from apps.transactions.views import TransactionHistoryView
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("users/", include("apps.users.urls")),
     path("accounts/", include("apps.accounts.urls")),
+    path("transactions/", include("apps.transactions.urls")),
 ]
