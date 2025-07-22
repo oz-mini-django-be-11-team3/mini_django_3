@@ -93,7 +93,7 @@ BANK_CODES = [
 ]
 
 # 계좌 종류
-ACCOUNT_TYPE = [
+ACCOUNT_TYPE_CHOICES = [
     ("CHECKING", "입출금"),
     ("SAVING", "적금"),
     ("LOAN", "대출"),
