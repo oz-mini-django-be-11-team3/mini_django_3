@@ -1,12 +1,11 @@
 from django.urls import path
 
-from .views import AccountDeleteAPIView, AccountListCreateApiView
+from .models import Account
+from .views import AccountAPIView, AccountListApiView
 
 app_name = "accounts"
 
 urlpatterns = [
-    path(
-        "list-create/", AccountListCreateApiView.as_view(), name="account-list-create"
-    ),
-    path("delete/<int:pk>/", AccountDeleteAPIView.as_view(), name="account-delete"),
+    path( "", AccountListApiView.as_view(), name="account-list-create" ),
+    path("<int:pk>/", AccountAPIView.as_view(), name="account-delete"),
 ]

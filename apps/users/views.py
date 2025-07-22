@@ -10,17 +10,20 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from .permissions import IsOwner
 from .serializers import (LoginSerializer, UserRegistrationSerializer,
-                          UserSerializer)
+                          UserProfileSerializer, UserInfoSerializer)
 
 User = get_user_model()
 
 
-class UserRegistrationView(APIView):
+class UsersAPIView(APIView):
     """
     새로운 사용자 계정을 생성하는 API 뷰입니다.
     """
 
+    # .settings.py의 기본 설정인 'simplejwt' 사용 해제
     authentication_classes = ()
+
+    # .settings.py의 기본 설정인 '인증된 사용자만 허용' 사용 해제
     permission_classes = (AllowAny,)
 
     @extend_schema(
@@ -49,10 +52,10 @@ class UserRegistrationView(APIView):
     )
     def post(self, request):
         serializer = UserRegistrationSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()  # 시리얼라이저의 create 메서드 호출
+        if serializer.is_valid(): # UserRegistrationSerializer.validate()
+            serializer.save() # UserRegistrationSerializer.create()
             return Response(
-                {"message": "회원가입이 성공적으로 완료되었습니다."},
+                data={"message": "회원가입이 성공적으로 완료되었습니다."},
                 status=status.HTTP_201_CREATED,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -75,33 +78,38 @@ class JWTLoginView(APIView):
     )
     def post(self, request):
         serializer = LoginSerializer(data=request.data, context={"request": request})
-        serializer.is_valid(
-            raise_exception=True
-        )  # 유효성 검사 실패 시 자동으로 400 응답
 
-        user = serializer.validated_data[
-            "user"
-        ]  # validate 메서드에서 설정한 user 가져오기
+        try:
+            # ValidationError:HTTP_400_BAD_REQUEST 응답
+            serializer.is_valid(raise_exception=True)
 
-        refresh = RefreshToken.for_user(user)
-        access_token = str(refresh.access_token)
+            user = serializer.validated_data["user"]
 
-        # user 객체를 시리얼라이저에 바로 전달
-        user_serializer = UserSerializer(user)
+            # Token 발급
+            refresh = RefreshToken.for_user(user)
+            access_token = str(refresh.access_token)
 
-        response = Response(
-            {"access": access_token, "user": user_serializer.data},
-            status=status.HTTP_200_OK,
-        )
-        response.set_cookie(
-            "refresh_token",
-            value=str(refresh),
-            httponly=True,
-            secure=settings.REFRESH_TOKEN_COOKIE_SECURE,
-            samesite="Lax",
-            max_age=5 * 60 * 60,  # 5시간
-        )
-        return response
+            user_serializer = UserInfoSerializer(user)
+
+            response = Response(
+                {"access": access_token, "user": user_serializer.data},
+                status=status.HTTP_200_OK,
+            )
+            response.set_cookie(
+                "refresh_token",
+                value=str(refresh),
+                httponly=True,
+                secure=settings.REFRESH_TOKEN_COOKIE_SECURE,
+                samesite="Lax",
+                max_age=5 * 60 * 60,  # 5시간
+            )
+            return response
+        except AttributeError:
+            return Response(
+                {"error": f"아이디나 비밀번호를 확인해주세요."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
 
 
 class JWTLogoutView(APIView):
@@ -115,40 +123,43 @@ class JWTLogoutView(APIView):
             500: {"message": "서버에 문제가 있습니다."},
         }
     )
-    def post(self, request):
+    def get(self, request):
         try:
             refresh_token = request.COOKIES.get("refresh_token")
 
-            if not refresh_token:
-                return Response(
-                    {"error": "Refresh token이 제공되지 않았습니다."},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
+            # SimpleJWT가 앱 수준에서 HTTP_401_UNAUTHORIZED 에러 내줌
+            # error: Authentication credentials were not provided
+            # error: token_not_valid
+            # "code": "user_not_found"
+            #
+            # 이상한 토큰이나 만료된 토큰이면, HTTP_400_BAD_REQUEST
+            # error: Token is blacklisted
+            #
+            # if not refresh_token:
+            #     return Response(
+            #         {"error": "Refresh token이 제공되지 않았습니다."},
+            #         status=status.HTTP_400_BAD_REQUEST,
+            #     )
 
-            token = RefreshToken(refresh_token)  # RefreshToken 객체로 만들어줌
+            token = RefreshToken(refresh_token)
             token.blacklist()  # refresh token을 블랙리스트에 추가
 
             response = Response(
                 {"message": "성공적으로 로그아웃되었습니다."},
-                status=status.HTTP_205_RESET_CONTENT,  # HTTP 204 No Content도 흔히 사용됨
+                status=status.HTTP_205_RESET_CONTENT,  # or HTTP_204_NO_CONTENT
             )
-
-            #    로그인 시 설정했던 쿠키 옵션과 동일하게 설정하는 것이 중요함!
             response.set_cookie(
                 "refresh_token",
-                value="",  # 값을 비워줌
+                value="",
                 httponly=True,
                 secure=settings.REFRESH_TOKEN_COOKIE_SECURE,
                 samesite="Lax",
                 max_age=0,  # 만료 시간을 0으로 설정하여 즉시 삭제
-                expires="Thu, 01 Jan 1970 00:00:00 GMT",
             )
             return response
-
-        except TokenError:
-            # simplejwt의 TokenError (예: 토큰이 유효하지 않거나 만료됨)
+        except TokenError as e:
             return Response(
-                {"error": "유효하지 않거나 만료된 토큰입니다."},
+                data={"message": str(e)},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         except Exception as e:
@@ -165,7 +176,7 @@ class UserProfileAPIView(APIView):
     """
 
     # View 수준 권한 검사
-    permission_classes = (IsOwner,)  # IsAuthenticated는 has_permission에서 처리
+    permission_classes = (IsOwner,)
 
     @extend_schema(
         responses={
@@ -173,49 +184,53 @@ class UserProfileAPIView(APIView):
             500: {"message": "서버에 문제가 있습니다."},
         }
     )
-    def get(self, request, pk):
+    def get(self, request):
         """
         GET: 특정 사용자의 프로필 정보를 조회합니다.
         """
-        user_to_retrieve = get_object_or_404(User, pk=pk)
+
+        # custom_permission_classes 안 쓰고 request.user.pk로 대신 사용 가능
+        user_to_retrieve = get_object_or_404(User, pk=request.user.id)
 
         # 객체 수준 권한 검사: 요청하는 사용자가 이 프로필의 소유자인지 확인
         # APIView는 generics 뷰와 달리 check_object_permissions을 명시적으로 호출해야 합니다.
         self.check_object_permissions(request, user_to_retrieve)
 
-        serializer = UserSerializer(user_to_retrieve)
+        serializer = UserInfoSerializer(user_to_retrieve)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @extend_schema(
-        request=UserSerializer,
+        request=UserProfileSerializer,
         responses={
             200: {"message": "프로필이 성공적으로 수정되었습니다."},
-            400: UserSerializer,
+            400: UserProfileSerializer,
         },
     )
-    def patch(self, request, pk):
+    def patch(self, request):
         """
         PATCH: 특정 사용자의 프로필 정보를 부분 업데이트합니다.
         """
-        user_to_update = get_object_or_404(User, pk=pk)
-
-        # 객체 수준 권한 검사
+        user_to_update = get_object_or_404(User, pk=request.user.id)
         self.check_object_permissions(request, user_to_update)
 
         # partial=True는 PATCH 요청에 필수적입니다. 일부 필드만 검증합니다.
-        serializer = UserSerializer(user_to_update, data=request.data, partial=True)
+        serializer = UserProfileSerializer(user_to_update, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
-        serializer.save()  # 업데이트된 인스턴스 저장
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        user = serializer.save()  # 업데이트된 인스턴스 저장
 
-    @extend_schema(responses={204: None, 500: {"message": "서버에 문제가 있습니다."}})
-    def delete(self, request, pk):
+        user_serializer = UserInfoSerializer(user)
+
+        return Response(user_serializer.data, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        responses={204: None,}
+    )
+    def delete(self, request):
         """
         DELETE: 특정 사용자 계정을 삭제합니다.
         """
-        user_to_delete = get_object_or_404(User, pk=pk)
 
-        # 객체 수준 권한 검사
+        user_to_delete = get_object_or_404(User, pk=request.user.id)
         self.check_object_permissions(request, user_to_delete)
 
         user_to_delete.delete()  # 사용자 삭제

@@ -2,11 +2,12 @@ from django.urls import path
 
 from . import views
 from .views import (JWTLoginView, JWTLogoutView, UserProfileAPIView,
-                    UserRegistrationView)
+                    UsersAPIView)
 
 urlpatterns = [
-    path("register/", UserRegistrationView.as_view(), name="register"),
+    path("", UsersAPIView.as_view(), name="user_signin"),
+    # <int:pk>
+    path("me/", UserProfileAPIView.as_view(), name="user_profile"),
     path("auth/login/", JWTLoginView.as_view(), name="jwt_login"),
     path("auth/logout/", JWTLogoutView.as_view(), name="jwt_logout"),
-    path("<int:pk>/", UserProfileAPIView.as_view(), name="user_profile"),
 ]

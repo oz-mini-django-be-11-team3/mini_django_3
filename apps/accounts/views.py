@@ -8,7 +8,7 @@ from .models import Account
 from .serializers import AccountSerializer
 
 
-class AccountListCreateApiView(APIView):  # 계좌 목록 조회 , 생성을 처리함
+class AccountListApiView(APIView):  # 계좌 목록 조회 , 생성을 처리함
     @extend_schema(
         summary="현재 로그인된 사용자의 계좌 목록 조회",
         description="인증된 사용자가 소유한 모든 계좌의 목록을 조회합니다.",
@@ -21,9 +21,7 @@ class AccountListCreateApiView(APIView):  # 계좌 목록 조회 , 생성을 처
         tags=["accounts"],  # Swagger UI에서 뷰를 그룹화하는 태그
     )
     def get(self, request):  # 계좌 목록 조회
-        accounts = Account.objects.filter(
-            user=request.user
-        )  # 로그인한 사용자와 관련된 계좌만 필터링
+        accounts = Account.objects.filter(user=request.user)  # 로그인한 사용자와 관련된 계좌만 필터링
         serializer = AccountSerializer(
             accounts, many=True
         )  # accounts 데이터를 AccountSeriailzer를 사용하여 변환(JSON형식)
@@ -43,19 +41,17 @@ class AccountListCreateApiView(APIView):  # 계좌 목록 조회 , 생성을 처
     )
     def post(self, request):  # 새 계좌 생성
         serializer = AccountSerializer(data=request.data)
-        if serializer.is_valid():  # 데이터가 유효한지 확인
-            serializer.save(
-                user=request.user
-            )  # 새 계좌가 현재 로그인한 사용자의 계좌로 생성
+        if serializer.is_valid():
+            serializer.save(user=request.user)
             return Response(
                 serializer.data, status=status.HTTP_201_CREATED
-            )  # 새 계좌 성공적으로 생성, 상태코드 201
+            )
         return Response(
             serializer.errors, status=status.HTTP_400_BAD_REQUEST
-        )  # 유효하지 않은 데이터가 있을 시 오류 메시지와 상태코드 400
+        )
 
 
-class AccountDeleteAPIView(APIView):  # 계좌 삭제 처리
+class AccountAPIView(APIView):  # 계좌 삭제 처리
     @extend_schema(
         summary="계좌 삭제",
         description="현재 로그인된 사용자의 계좌를 삭제합니다.",

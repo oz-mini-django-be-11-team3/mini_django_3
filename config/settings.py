@@ -111,18 +111,17 @@ SIMPLE_JWT = {
     "BLACKLIST_AFTER_ROTATION": True,
     "ALGORITHM": "HS256",
     "SIGNING_KEY": SECRET_KEY,
+    "UPDATE_LAST_LOGIN": False,
 }
 
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
         "HOST": os.getenv("DB_HOST"),
+        "PORT": os.getenv("DB_PORT"),
         "NAME": os.getenv("DB_NAME"),
         "USER": os.getenv("DB_USER"),
-        "PASSWORD": os.getenv("DB_PASS"),
-        "PORT": os.getenv("DB_PORT"),
-        # 'ENGINE': 'django.db.backends.sqlite3',
-        # 'NAME': BASE_DIR / 'db.sqlite3',
+        "PASSWORD": os.getenv("DB_PASSWORD"),
     }
     # 'default': {
     #     # 'ENGINE': 'django.db.backends.sqlite3',

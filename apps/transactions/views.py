@@ -168,8 +168,11 @@ class TransactionHistoryDetailView(APIView):
         # partial 옵션을 설정하지 않으면 기본값인 False 가 되어 모든 필드가 포함 되어야 유효성 검증을 통과
 
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            tranx=serializer.save()
+
+            put_tranx_serializer=TransactionHistorySerializer(tranx)
+
+            return Response(put_tranx_serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @extend_schema(

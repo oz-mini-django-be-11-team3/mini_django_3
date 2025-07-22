@@ -6,12 +6,10 @@ from apps.common.models import CommonModel
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
-        if not email:
-            raise ValueError("이메일 주소는 필수입니다.")
-
         email = self.normalize_email(email)  # 이메일 주소를 정규화
         user = self.model(email=email, **extra_fields)
         user.set_password(password)  # 비밀번호 해싱
+
         user.save(using=self._db)
         return user
 
@@ -31,9 +29,7 @@ class User(AbstractUser, CommonModel):
         max_length=255,
         unique=True,
     )
-    username = models.CharField(
-        "이름",
-    )
+    username = models.CharField("이름")
     # 닉네임 필드
     nickname = models.CharField(max_length=50, unique=True, verbose_name="닉네임")
     # 이름 필드
