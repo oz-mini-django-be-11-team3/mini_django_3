@@ -72,5 +72,5 @@ jobs:
         aws deploy create-deployment \
           --application-name ozproject \
           --deployment-group-name ozproject-group \
-          --s3-location bucket=ozgitzip,bundleType=zip,key=deploy.zip \
+          --s3-location bucket=ozgitzip,bundleType=zip,key=ozdeploy.zip \
           --file-exists-behavior OVERWRITE
