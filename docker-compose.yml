@@ -14,7 +14,7 @@ services: # Container
         required: true
     volumes:
       - ./app:/app
-    command: [ "run.sh" ]
+#    command: [ "run.sh" ]
 
 #  app: # Django
 #    build:
