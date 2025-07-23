@@ -8,7 +8,7 @@ hooks:
     - location: start.sh
       timeout: 60
       runas: ec2-user
-  ApplicationStart:
-    - location: oz/run.sh
-      timeout: 300
-      runas: root
+#  ApplicationStart:
+#    - location: oz/run.sh
+#      timeout: 300
+#      runas: root
