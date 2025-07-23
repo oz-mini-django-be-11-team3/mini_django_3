@@ -5,6 +5,6 @@ files:
     destination: /home/ec2-user/oz
 hooks:
   AfterInstall:
-    - location: scripts/start.sh
+    - location: start.sh
       timeout: 60
       runas: ec2-user
