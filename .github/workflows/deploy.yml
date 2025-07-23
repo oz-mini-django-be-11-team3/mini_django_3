@@ -50,7 +50,7 @@ jobs:
 
     - name: Zip for CodeDeploy(to S3)
       run: |
-        zip ozdeploy.zip appspec.yml start.sh .env docker-compose.yml
+        zip ozdeploy.zip appspec.yml start.sh .env docker-compose.yml run.sh
 
       # 압축한 프로젝트를 S3로 전송
     - name: Upload to S3
