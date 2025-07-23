@@ -1,16 +1,14 @@
 #version: "3.11" # Docker Compose API
 
 services: # Container
-  app: # Django
-    build:
-      context: . # Dockerfile
-      args:
-        - DEV=true
+  app:
+    image: 201730504509.dkr.ecr.ap-northeast-2.amazonaws.com/djangomini:latest
+    build: .
     networks:
       - shared-net
     ports:
       - "8000:8000"
-#    env_file: .env
+    env_file: .env
     depends_on:
       db:
         condition: service_started
@@ -18,6 +16,24 @@ services: # Container
     volumes:
       - ./app:/app
     command: [ "/scripts/run.sh" ]
+
+#  app: # Django
+#    build:
+#      context: . # Dockerfile
+#      args:
+#        - DEV=true
+#    networks:
+#      - shared-net
+#    ports:
+#      - "8000:8000"
+#    env_file: .env
+#    depends_on:
+#      db:
+#        condition: service_started
+#        required: true
+#    volumes:
+#      - ./app:/app
+#    command: [ "/scripts/run.sh" ]
 
   db:
     image: postgres:17

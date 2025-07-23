@@ -44,27 +44,27 @@ jobs:
         DJANGO_ALLOWED_HOSTS=127.0.0.1, 0.0.0.0, 52.79.250.125
         EOF
 
-#    - name: Login to Amazon ECR
-#      id: login-ecr
-#      uses: aws-actions/amazon-ecr-login@v1
-
-    - name: Zip for CodeDeploy
-      run: |
-        zip -r ozdeploy.zip . 
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
 
       # 압축한 프로젝트를 S3로 전송
     - name: Upload to S3
       run: aws s3 cp --region ap-northeast-2 ozdeploy.zip s3://ozgitzip/ozdeploy.zip
 
-#    - name: Build, tag, and push image to Amazon ECR
-#      id: build-image
-#      env:
-#        ECR_REGISTRY: 201730504509.dkr.ecr.ap-northeast-2.amazonaws.com/djangomini
-#        IMAGE_TAG: latest
-#      run: |
-#        docker build -t $ECR_REGISTRY:$IMAGE_TAG .
-#        docker push $ECR_REGISTRY:$IMAGE_TAG
-#        echo "::set output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+    - name: Build, tag, and push image to Amazon ECR
+      id: build-image
+      env:
+        ECR_REGISTRY: 201730504509.dkr.ecr.ap-northeast-2.amazonaws.com/djangomini
+        IMAGE_TAG: latest
+      run: |
+        docker build -t $ECR_REGISTRY:$IMAGE_TAG .
+        docker push $ECR_REGISTRY:$IMAGE_TAG
+        echo "::set output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
+    - name: Zip for CodeDeploy
+      run: |
+        zip ozdeploy.zip appspec.yml start.sh .env docker-compose.yml
 
     # 배포 그룹으로 애플리케이션 전송
     - name: Trigger CodeDeploy
