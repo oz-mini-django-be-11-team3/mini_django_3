@@ -1,0 +1,76 @@
+name: Push Zip to S3
+
+on:
+  push:
+    branches:
+      - develop
+
+env:
+  AWS_REGION: ap-northeast-2                   # set this to your preferred AWS region, e.g. us-west-1
+  ECR_REPOSITORY: djangomini                 # set this to your Amazon ECR repository name
+
+#  ECS_SERVICE: MY_ECS_SERVICE                 # set this to your Amazon ECS service name
+#  ECS_CLUSTER: MY_ECS_CLUSTER                 # set this to your Amazon ECS cluster name
+#  ECS_TASK_DEFINITION: MY_ECS_TASK_DEFINITION # set this to the path to your Amazon ECS task definition
+#                                               # file, e.g. .aws/task-definition.json
+#  CONTAINER_NAME: MY_CONTAINER_NAME           # set this to the name of the container in the
+#                                               # containerDefinitions section of your task definition
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+        aws-region: ap-northeast-2
+
+    - name: Generate .env
+      run: |
+        cat <<EOF > .env
+        DB_HOST=db
+        DB_PORT=5432
+        DB_USER=postgres
+        DB_PASSWORD=0000
+        DB_NAME=postgres
+        DJANGO_ALLOWED_HOSTS=127.0.0.1, 0.0.0.0, 52.79.250.125
+        EOF
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Zip for CodeDeploy(to S3)
+      run: |
+        zip ozdeploy.zip appspec.yml start.sh .env docker-compose.yml run.sh
+
+      # 압축한 프로젝트를 S3로 전송
+    - name: Upload to S3
+      run: aws s3 cp --region ap-northeast-2 ozdeploy.zip s3://ozgitzip/ozdeploy.zip
+
+    - name: Build, tag, and push image to Amazon ECR
+      id: build-image
+      env:
+        ECR_REGISTRY: 201730504509.dkr.ecr.ap-northeast-2.amazonaws.com/django
+        IMAGE_TAG: latest
+      run: |
+        docker build -t $ECR_REGISTRY:$IMAGE_TAG .
+        docker push $ECR_REGISTRY:$IMAGE_TAG
+        echo "::set output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
+    # 배포 그룹으로 애플리케이션 전송
+    - name: Trigger CodeDeploy
+      run: |
+        aws deploy create-deployment \
+          --application-name ozproject \
+          --deployment-group-name ozproject-group \
+          --s3-location bucket=ozgitzip,bundleType=zip,key=ozdeploy.zip \
+          --file-exists-behavior OVERWRITE
