@@ -12,8 +12,8 @@ services: # Container
       db:
         condition: service_started
         required: true
-    volumes:
-      - ./app:/app
+#    volumes:
+#      - ./app:/app
 
 #  app: # Django
 #    build:
