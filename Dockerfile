@@ -19,7 +19,7 @@ RUN uv sync --all-packages && \
     --no-create-home \
     django-user
 
-COPY ./app ./app
+COPY ./app ./
 
 # ⬇️ run.sh를 scripts 디렉토리에 넣고 절대 경로 사용
 COPY run.sh /scripts/run.sh
