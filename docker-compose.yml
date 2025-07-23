@@ -3,7 +3,6 @@
 services: # Container
   app:
     image: 201730504509.dkr.ecr.ap-northeast-2.amazonaws.com/django:latest
-    build: .
     networks:
       - shared-net
     ports:
