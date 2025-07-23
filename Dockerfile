@@ -35,8 +35,8 @@ EXPOSE 8000
 #CMD ["uv", "run", "gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "2", "--worker-class", "uvicorn.workers.UvicornWorker"]
 
 # 스크립트를 사용하여 애플리케이션 실행
-COPY run.sh .
-RUN chmod +x ./run.sh
+COPY run.sh /app/run.sh
+RUN chmod +x /app/run.sh
 CMD ["./run.sh"]
 
 # 서버 실행 CMD
