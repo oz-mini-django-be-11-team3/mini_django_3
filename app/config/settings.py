@@ -10,14 +10,16 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+from dotenv import load_dotenv  # .env에 있는 환경변수를 불러온다.
+
 import os
 from datetime import timedelta
 from pathlib import Path
 
-from dotenv import load_dotenv  # .env에 있는 환경변수를 불러온다.
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
 
 # dotenv_path = BASE_DIR / ".env"
 # load_dotenv(dotenv_path=dotenv_path)

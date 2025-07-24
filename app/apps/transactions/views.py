@@ -2,9 +2,11 @@ from decimal import Decimal
 
 from apps.accounts.models import Account
 from apps.transactions.models import TransactionHistory
-from apps.transactions.serializers import (TransactionHistorySerializer,
-                                           TransactionsCreateSerializer,
-                                           TransactionsUpdateSerializer)
+from apps.transactions.serializers import (
+    TransactionHistorySerializer,
+    TransactionsCreateSerializer,
+    TransactionsUpdateSerializer,
+)
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema

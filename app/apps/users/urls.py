@@ -1,8 +1,7 @@
 from django.urls import path
 
 from . import views
-from .views import (JWTLoginView, JWTLogoutView, UserProfileAPIView,
-                    UsersAPIView)
+from .views import JWTLoginView, JWTLogoutView, UserProfileAPIView, UsersAPIView
 
 urlpatterns = [
     path("", UsersAPIView.as_view(), name="user_signin"),

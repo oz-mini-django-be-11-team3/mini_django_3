@@ -1,7 +1,10 @@
 from django.urls import path
 
-from .views import (TransactionHistoryCreateView, TransactionHistoryDetailView,
-                    TransactionHistoryView)
+from .views import (
+    TransactionHistoryCreateView,
+    TransactionHistoryDetailView,
+    TransactionHistoryView,
+)
 
 app_name = "transactions"
 urlpatterns = [

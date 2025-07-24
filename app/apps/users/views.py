@@ -9,8 +9,12 @@ from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .permissions import IsOwner
-from .serializers import (LoginSerializer, UserInfoSerializer,
-                          UserProfileSerializer, UserRegistrationSerializer)
+from .serializers import (
+    LoginSerializer,
+    UserInfoSerializer,
+    UserProfileSerializer,
+    UserRegistrationSerializer,
+)
 
 User = get_user_model()
 
