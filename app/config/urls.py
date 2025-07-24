@@ -18,10 +18,27 @@ Including another URLconf
 from apps.transactions.views import TransactionHistoryView
 from django.contrib import admin
 from django.urls import include, path
+from drf_spectacular.views import (SpectacularAPIView, SpectacularRedocView,
+                                   SpectacularSwaggerView)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("users/", include("apps.users.urls")),
     path("accounts/", include("apps.accounts.urls")),
     path("transactions/", include("apps.transactions.urls")),
+    # --- drf-spectacular URL 패턴 추가 ---
+    # 1. API 스키마를 JSON/YAML 형식으로 제공
+    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+    # 2. Swagger UI (시각적인 API 문서)
+    path(
+        "api/schema/swagger-ui/",
+        SpectacularSwaggerView.as_view(url_name="schema"),
+        name="swagger-ui",
+    ),
+    # 3. ReDoc UI (또 다른 시각적인 API 문서)
+    path(
+        "api/schema/redoc/",
+        SpectacularRedocView.as_view(url_name="schema"),
+        name="redoc",
+    ),
 ]
